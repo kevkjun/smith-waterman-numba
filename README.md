@@ -1,3 +1,2 @@
-# Final Project
+# README - Kevin Jun MPCS 56420 Final Project
 
-## Kevin Jun - MPCS 56420

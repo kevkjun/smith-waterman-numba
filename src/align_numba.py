@@ -145,7 +145,7 @@ if __name__ == "__main__":
         np_db_seqs = np.array(db_seqs_chars)
 
         # change alignment_seq to np.array of ASCII codes
-        np_alignment_seq = np.array([ord(char) for char in str(alignment_seq)])
+        np_alignment_seq = np.array([int(ord(char)) for char in str(alignment_seq)])
 
         # create scratch np.array with enough spaces to compute scores for each residue of the alignment sequence
         scratch = np.zeros((len(db_seqs), len(np_alignment_seq)), dtype=np.int64)

@@ -77,16 +77,16 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
                 # b/c the scratch array is only 2d, it will be constantly written over as new maxes are found
                 # need to remember the new northwest which is the value in the current cell
                 new_northwest = scratch[thread_id][j]
+                print(new_northwest)
 
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
                 # have to manually calculate these indices bc otherwise numba freaks out about typing
                 i_idx = seq[j]-65
-                current_db_seq = db[thread_id]
-                j_idx = current_db_seq[k]-65
+                j_idx = db[thread_id, k] - 65
 
                 # find scores from the matrix and compare with left, up, nw, and 0 to get max
                 s = matrix[i_idx][j_idx]
-                left = scratch[thread_id][j-1] if j > 0 else 0
+                left = scratch[thread_id, j-1] if j > 0 else 0
                 
                 scratch[thread_id][j] = max(northwest + s, 
                                             left + gap, 
@@ -97,8 +97,10 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
 
                 # set the new "northward" cell for the next calculation. 
                 # it's the next cell in the scratch array. must mod in case it runs over
-                up = scratch[thread_id][j+1 % len(seq)]
-        res[thread_id] = scratch[thread_id][ref_seq_len - 1]
+                current_seq = scratch[thread_id]
+                up = current_seq[j+1 % len(seq)]
+        current_idx = scratch[thread_id]
+        res[thread_id] = current_idx[ref_seq_len - 1]
     return res
 
 

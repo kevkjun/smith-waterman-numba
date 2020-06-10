@@ -14,7 +14,6 @@
 * CUDA-enabled GPU
 * CUDA Toolkit (at least version 8.0)
 
-
 ## Running the code
 
 ### `align.py`
@@ -25,7 +24,7 @@ This is the standard serial version of the sequence alignment code. Function sig
 python align.py --infile ../data/spike.fasta --scope local --gap 3 --db ../data/spike.fasta --matrix BLOSUM62 --outfile ../results/align_serial.txt
 ```
 
-### Numba implementation
+### `align_numba.py`
 
 #### JIT CPU
 

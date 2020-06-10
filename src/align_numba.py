@@ -157,11 +157,12 @@ if __name__ == "__main__":
         # create scratch np.array with enough spaces to compute scores for each residue of the alignment sequence
         scratch = np.zeros((len(db_seqs), len(np_alignment_seq)), dtype=np.int64)
 
+        # timing needs to be done separately or we will be counting the time to write and allocate memory
         if impl == 'jit':
             scores = np.zeros(len(db_seqs), dtype=np.int64)
 
             # call it once ahead of time for numba to compile and cache 
-            scores = align(gap, matrix, np_alignment_seq, np_db_seqs, scores, scratch)
+            align(gap, matrix, np_alignment_seq, np_db_seqs, scores, scratch)
 
             # call second time to time the true performance
             start = timer() 

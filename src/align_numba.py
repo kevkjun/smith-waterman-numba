@@ -68,14 +68,14 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
     ref_seq_len = len(seq)
     up = 0
     thread_id = cuda.grid(1)
-    for j, seq_res in enumerate(seq):
+    for j in range(len(seq)):
         northwest = 0
-        for k, db_seq_res in enumerate(db[thread_id]):
-                if db_seq_res == 0:
+        for k in range(len(db[thread_id])):
+                if db[thread_id][k] == 0:
                     break
                 new_northwest = scratch[thread_id][j]
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
-                s = matrix[seq_res-65][db_seq_res-65]
+                s = matrix[seq[j]-65][db[thread_id][k]-65]
                 left = scratch[thread_id][j-1] if j > 0 else 0
                 
                 scratch[thread_id][j] = max(northwest + s, 
@@ -155,11 +155,13 @@ if __name__ == "__main__":
         if impl == 'jit':
             scores = align(gap, matrix, np_alignment_seq, np_db_seqs, scores, scratch)
         else:
+            # copy the needed arrays to the device
             device_matrix = cuda.to_device(matrix)
             device_np_alignment_seq = cuda.to_device(np_alignment_seq)
             device_db_seqs = cuda.to_device(db_seqs)
             device_scratch = cuda.to_device(scratch)
 
+            # allocate memory on device for result
             device_scores = cuda.device_array(len(db_seqs))
 
             # launch kernel

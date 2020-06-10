@@ -71,24 +71,24 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
     for j in range(len(seq)):
         northwest = 0
         for k in range(len(db[thread_id])):
-                if db[thread_id][k] == 0:
+                if db[thread_id, k] == 0:
                     break
 
                 # b/c the scratch array is only 2d, it will be constantly written over as new maxes are found
                 # need to remember the new northwest which is the value in the current cell
-                new_northwest = scratch[thread_id][j]
+                new_northwest = scratch[thread_id, j]
                 print(new_northwest)
 
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
                 # have to manually calculate these indices bc otherwise numba freaks out about typing
                 i_idx = seq[j]-65
-                j_idx = db[thread_id, k] - 65
+                j_idx = db[thread_id, k]-65
 
                 # find scores from the matrix and compare with left, up, nw, and 0 to get max
-                s = matrix[i_idx][j_idx]
+                s = matrix[i_idx, j_idx]
                 left = scratch[thread_id, j-1] if j > 0 else 0
                 
-                scratch[thread_id][j] = max(northwest + s, 
+                scratch[thread_id, j] = max(northwest + s, 
                                             left + gap, 
                                             up + gap, 
                                             0)
@@ -173,7 +173,7 @@ if __name__ == "__main__":
             # copy the needed arrays to the device
             device_matrix = cuda.to_device(matrix)
             device_np_alignment_seq = cuda.to_device(np_alignment_seq)
-            device_db_seqs = cuda.to_device(db_seqs)
+            device_db_seqs = cuda.to_device(np_db_seqs)
             device_scratch = cuda.to_device(scratch)
 
             # allocate memory on device for result

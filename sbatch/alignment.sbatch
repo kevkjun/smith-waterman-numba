@@ -9,4 +9,4 @@
 module load Anaconda3
 source activate mpcs56420
 
-python ../src/align.py --infile ../data/spike.fasta --scope local --gap 3 --db ../data/excerpt_pdbaa.fasta --matrix BLOSUM62 --out ../results/align_serial.fasta
+python ../src/align.py --infile ../data/spike.fasta --scope local --gap 3 --db ../data/excerpt_pdbaa.fasta --matrix BLOSUM62 --out ../results/align_serial.txt

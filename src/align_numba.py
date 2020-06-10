@@ -14,9 +14,13 @@ import argparse
 
 from numba import jit, cuda, types
 from timeit import default_timer as timer
-
-from Bio import SeqIO
 from matrices import matrices
+
+# Midway requires lowercase bio but other machines require upper
+try:
+    from Bio import SeqIO
+except:
+    from bio import SeqIO
 
 
 # ##################################################################

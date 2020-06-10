@@ -9,7 +9,11 @@ import heapq as hp
 import argparse
 import timeit
 
-from Bio import SeqIO
+# Midway requires lowercase bio but other machines require upper
+try:
+    from Bio import SeqIO
+except:
+    from bio import SeqIO
 
 # found the matrix here: https://www.biostars.org/p/405990/
 blosum62 = {

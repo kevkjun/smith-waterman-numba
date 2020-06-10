@@ -66,7 +66,7 @@ score_gpu = cuda.jit(device=True)(score)
 def align_gpu(gap, matrix, seq, db, res, scratch):
     ref_seq_len = len(seq)
     up = 0
-    thread_id = cuda.grid()
+    thread_id = cuda.grid(1)
     for j, seq_res in enumerate(seq):
         northwest = 0
         for k, db_seq_res in enumerate(db[thread_id]):

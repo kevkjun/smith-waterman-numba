@@ -16,7 +16,7 @@ from numba import jit, cuda, types
 from timeit import default_timer as timer
 from matrices import matrices
 
-# Midway requires lowercase bio but other machines require upper
+# Some machines require lowercase bio import
 try:
     from Bio import SeqIO
 except:
@@ -114,8 +114,8 @@ if __name__ == "__main__":
         for record in SeqIO.parse(db, "fasta"):
             if len(record.seq) > longest_seq_length:
                 longest_seq_length = len(record.seq)
-            db_seqs.append(record.seq)
-            db_headers.append(record.description)
+            db_seqs.append(str(record.seq))
+            db_headers.append(str(record.description))
         longest_length = max(longest_seq_length, len(alignment_seq))
 
         f.write(f'Query Sequence:\n>{alignment_seq}\n\nDatabase: {db}\n\n')

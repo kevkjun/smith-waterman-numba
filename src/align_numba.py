@@ -74,7 +74,7 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
                     break
                 new_northwest = scratch[thread_id][j]
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
-                scratch[i][j] = score_gpu(thread_id, j, gap, northwest, up, matrix, seq_res - 65, db_seq_res - 65, scratch)
+                scratch[thread_id][j] = score_gpu(thread_id, j, gap, northwest, up, matrix, seq_res - 65, db_seq_res - 65, scratch)
                 northwest = new_northwest
                 up = scratch[thread_id][j+1 % len(seq)]
         res[thread_id] = scratch[thread_id][ref_seq_len - 1]

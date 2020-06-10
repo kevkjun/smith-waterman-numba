@@ -97,11 +97,8 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
 
                 # set the new "northward" cell for the next calculation. 
                 # it's the next cell in the scratch array. must mod in case it runs over
-                current_seq = scratch[thread_id]
-                up = current_seq[j+1 % len(seq)]
-        current_idx = scratch[thread_id]
-        res[thread_id] = current_idx[ref_seq_len - 1]
-    return res
+                up = scratch[thread_id, j+1 % len(seq)]
+        res[thread_id] = scratch[thread_id, ref_seq_len - 1]
 
 
 if __name__ == "__main__":

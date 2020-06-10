@@ -75,8 +75,11 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
                     break
                 new_northwest = scratch[thread_id][j]
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
+                # have to manually calculate these indices bc otherwise numba freaks out about typing
                 i_idx = seq[j]-65
-                j_idx = db[thread_id][k]-65
+                ch = db[thread_id][k]
+                j_idx = ch-65
+
                 s = matrix[i_idx][j_idx]
                 left = scratch[thread_id][j-1] if j > 0 else 0
                 

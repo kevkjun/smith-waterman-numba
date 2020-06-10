@@ -1,8 +1,12 @@
 """
-Each thread gets a separate sequence to align.
-usage: alignment.py [-h] --infile INFILE --scope {global,local} --gap
+Each thread gets a separate sequence to align. 
+Given the t_count, enough grids will be initialized to equal enough threads for all sequences in database 
+    total threads = t_count * block_count
+t_count: number of threads to be launched per block (must be provided if CUDA impl is used)
+
+usage: align_numba.py [-h] --infile INFILE --gap
                     GAP --db DB --matrix {PAM250,BLOSUM62}
-                    [--outfile OUTFILE]
+                    [--outfile OUTFILE] --impl {jit, cuda} [--t_count T_COUNT]
 """
 
 import numpy as np
@@ -77,7 +81,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--infile', type=str, required=True)
-    parser.add_argument('--scope', type=str, choices = ['global', 'local'], required=True)
+    # parser.add_argument('--scope', type=str, choices = ['global', 'local'], required=True)
     parser.add_argument('--gap', type=int, required=True)
     parser.add_argument('--db', type=str, required=True)
     parser.add_argument('--matrix', type=str, choices=['PAM250', 'BLOSUM62'], required=True)
@@ -92,7 +96,7 @@ if __name__ == "__main__":
             header, alignment_seq = record.description, record.seq
 
         db = args.db
-        scope = args.scope
+        # scope = args.scope
         gap = -args.gap
         matrix = matrices.b62 if args.matrix == 'BLOSUM62' else matrices.p250
         impl = args.impl
@@ -110,25 +114,31 @@ if __name__ == "__main__":
             db_headers.append(record.description)
         longest_length = max(longest_seq_length, len(alignment_seq))
 
-        # unpack the strings in db_seqs
-        db_seqs_chars = [[ord(db_seq[i]) if i < len(db_seq) else 0 for i in range(longest_length)] for db_seq in db_seqs]
-        # create an np.array of np.array of ASCII codes for chars in sequences
-        np_db_seqs = np.array(db_seqs_chars)
-
         f.write(f'Query Sequence:\n>{alignment_seq}\n\nDatabase: {db}\n\n')
 
         ####### Define dimensions for CUDA kernel #######
+        ## grid_dim * block_dim = total thread count
         if impl == 'cuda':
             block_dim = args.t_count
             grid_dim = len(db_seqs)//64 if len(db_seqs) % 64 == 0 else len(db_seqs)//64 + 1
         
         ####### Alignment #######
+        ## Timing is including the time to set up all of the inputs/np.arrays to be fed to the kernel or used by Numba
+        ## Decided to include this because it's all included in the serial version as well
         start = timer() 
+
+        # unpack the strings in db_seqs
+        db_seqs_chars = [[ord(db_seq[i]) if i < len(db_seq) else 0 for i in range(longest_length)] for db_seq in db_seqs]
+
+        # create an np.array of np.array of ASCII codes for chars in sequences
+        np_db_seqs = np.array(db_seqs_chars)
 
         # change alignment_seq to np.array of ASCII codes
         np_alignment_seq = np.array([ord(char) for char in str(alignment_seq)])
+
         # create scratch np.array with enough spaces to compute scores for each residue of the alignment sequence
         scratch = np.zeros((len(db_seqs), len(np_alignment_seq)), dtype=np.int64)
+
         # create the return np.array
         scores = np.zeros(len(db_seqs), dtype=np.int64)
 
@@ -140,7 +150,10 @@ if __name__ == "__main__":
         stop = timer()
         runtime = stop - start
 
-        f.write(f'Implementation: {impl}\nRuntime: {runtime}\n\n')
+        f.write(f'Implementation: {impl}\n')
+        if impl == 'cuda':
+            f.write(f'Block dim: {block_dim}\t Grid dim: {grid_dim}\n')
+        f.write(f'Runtime: {runtime}\n\n')
 
         scores_list = list(scores)
         for score, desc in zip(scores_list, db_headers):

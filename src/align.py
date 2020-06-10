@@ -397,19 +397,18 @@ if __name__ == "__main__":
         db = args.db
         scope = args.scope
         gap = args.gap
-        newline = '\n'
 
-        f.write(f'Query Sequence:{newline}>{seq}{newline}{newline}Database: {db}{newline}{newline}')
+        f.write(f'Query Sequence:\n>{seq}\n\nDatabase: {db}\n\n')
 
         # https://stackoverflow.com/questions/5622976/how-do-you-calculate-program-run-time-in-python
         start = timeit.default_timer()
 
-        scores = [f'> {GlobalAligner(seq, str(record.seq), args.matrix, args.gap).alignment_score} | {record.description}{newline}' for record in SeqIO.parse(db, "fasta")]
+        scores = [f'> {GlobalAligner(seq, str(record.seq), args.matrix, args.gap).alignment_score} | {record.description}\n' for record in SeqIO.parse(db, "fasta")]
 
         stop = timeit.default_timer()
         runtime = stop - start
 
-        f.write(f'Runtime: {runtime}{newline}{newline}')
+        f.write(f'Implementation: Serial\nRuntime: {runtime}\n\n')
 
         for line in scores:
             f.write(line)

@@ -1,14 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=align           # Job name
-#SBATCH --mail-type=ALL               # Mail events (NONE, BEGIN, END, FAIL, ALL)
-#SBATCH --mail-user=kjun@uchicago.edu    # Where to send mail
+#SBATCH --output=align.out
 #SBATCH --ntasks=1                    # Run on a single CPU
 #SBATCH --cpus-per-task=1                # Number of threads per task
 #SBATCH --mem=32gb                     # Job memory request
-#SBATCH --time=05:00:00               # Time limit hrs:min:sec
-#SBATCH --output=align.out
+#SBATCH --time=01:00:00               # Time limit hrs:min:sec
 
 module load Anaconda3
 source activate mpcs56420
 
-python alignment.py --infile spike.fasta --scope global --gap 3 --db /project2/mpcs56420/db/pdbaa.fasta --matrix BLOSUM62 --out align.txt
+python ../src/align.py --infile ../data/spike.fasta --scope local --gap 3 --db ../data/excerpt_pdbaa.fasta --matrix BLOSUM62 --out ../results/align_serial.fasta

@@ -59,8 +59,8 @@ def align(gap, matrix, seq, db, res, scratch):
 # ##################### CUDA IMPLEMENTATION #####################
 # ###############################################################
 
-# Define CUDA implementation for the score algorithm above
-score_gpu = cuda.jit(device=True)(score)
+# # Define CUDA implementation for the score algorithm above
+# score_gpu = cuda.jit(device=True)(score)
 
 @cuda.jit
 def align_gpu(gap, matrix, seq, db, res, scratch):
@@ -74,7 +74,14 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
                     break
                 new_northwest = scratch[thread_id][j]
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
-                scratch[thread_id][j] = score_gpu(thread_id, j, gap, northwest, up, matrix, seq_res - 65, db_seq_res - 65, scratch)
+                s = matrix[seq_res][db_seq_res]
+                left = scratch[thread_id][j-1] if j > 0 else 0
+                
+                scratch[thread_id][j] = max(northwest + s, 
+                                            left + gap, 
+                                            up + gap, 
+                                            0)
+                # scratch[thread_id][j] = score_gpu(thread_id, j, gap, northwest, up, matrix, seq_res - 65, db_seq_res - 65, scratch)
                 northwest = new_northwest
                 up = scratch[thread_id][j+1 % len(seq)]
         res[thread_id] = scratch[thread_id][ref_seq_len - 1]

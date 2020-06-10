@@ -144,11 +144,6 @@ if __name__ == "__main__":
         if impl == 'cuda':
             block_dim = args.t_count
             grid_dim = len(db_seqs)//block_dim if len(db_seqs) % block_dim == 0 else len(db_seqs)//block_dim + 1
-        
-        ####### Alignment #######
-        ## Timing is including the time to set up all of the inputs/np.arrays to be fed to the kernel or used by Numba
-        ## Decided to include this because it's all included in the serial version as well
-        start = timer() 
 
         # unpack the strings in db_seqs
         db_seqs_chars = [[int(ord(db_seq[i])) if i < len(db_seq) else 0 for i in range(longest_length)] for db_seq in db_seqs]
@@ -164,7 +159,15 @@ if __name__ == "__main__":
 
         if impl == 'jit':
             scores = np.zeros(len(db_seqs), dtype=np.int64)
+
+            # call it once ahead of time for numba to compile and cache 
             scores = align(gap, matrix, np_alignment_seq, np_db_seqs, scores, scratch)
+
+            # call second time to time the true performance
+            start = timer() 
+            scores = align(gap, matrix, np_alignment_seq, np_db_seqs, scores, scratch)
+            stop = timer()
+            runtime = stop - start
         else:
             # copy the needed arrays to the device
             device_matrix = cuda.to_device(matrix)
@@ -175,13 +178,16 @@ if __name__ == "__main__":
             # allocate memory on device for result
             device_scores = cuda.device_array(len(db_seqs))
 
-            # launch kernel
+            # launch kernel once to compile and cache
             align_gpu[grid_dim, block_dim](gap, device_matrix, device_np_alignment_seq, device_db_seqs, device_scores, device_scratch)
 
-            scores = device_scores.copy_to_host()
+            # launch kernel again to time for real
+            start = timer() 
+            align_gpu[grid_dim, block_dim](gap, device_matrix, device_np_alignment_seq, device_db_seqs, device_scores, device_scratch)
+            stop = timer()
+            runtime = stop - start
 
-        stop = timer()
-        runtime = stop - start
+            scores = device_scores.copy_to_host()
 
         f.write(f'Implementation: {impl}\n')
         if impl == 'cuda':

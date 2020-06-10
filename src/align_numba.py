@@ -13,6 +13,7 @@ import numpy as np
 import argparse
 
 from numba import jit, cuda, types
+from numba import *
 from timeit import default_timer as timer
 from matrices import matrices
 
@@ -142,21 +143,29 @@ if __name__ == "__main__":
         db_seqs_chars = [[int(ord(db_seq[i])) if i < len(db_seq) else 0 for i in range(longest_length)] for db_seq in db_seqs]
 
         # create an np.array of np.array of ASCII codes for chars in sequences
-        np_db_seqs = np.array(db_seqs_chars)
+        np_db_seqs = np.array(db_seqs_chars, dtype=np.int64)
 
         # change alignment_seq to np.array of ASCII codes
-        np_alignment_seq = np.array([int(ord(char)) for char in str(alignment_seq)])
+        np_alignment_seq = np.array([int(ord(char)) for char in str(alignment_seq)], dtype=np.int64)
 
         # create scratch np.array with enough spaces to compute scores for each residue of the alignment sequence
         scratch = np.zeros((len(db_seqs), len(np_alignment_seq)), dtype=np.int64)
 
-        # create the return np.array
-        scores = np.zeros(len(db_seqs), dtype=np.int64)
 
         if impl == 'jit':
             scores = align(gap, matrix, np_alignment_seq, np_db_seqs, scores, scratch)
         else:
-            scores = align_gpu[grid_dim, block_dim](gap, matrix, np_alignment_seq, db_seqs, scores, scratch)
+            device_matrix = cuda.to_device(matrix)
+            device_np_alignment_seq = cuda.to_device(np_alignment_seq)
+            device_db_seqs = cuda.to_device(db_seqs)
+            device_scratch = cuda.to_device(scratch)
+
+            device_scores = cuda.device_array(len(db_seqs))
+
+            # launch kernel
+            align_gpu[grid_dim, block_dim](gap, device_matrix, device_np_alignment_seq, device_db_seqs, device_scores, device_scratch)
+
+            scores = device_scratch.copy_to_host()
 
         stop = timer()
         runtime = stop - start

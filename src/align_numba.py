@@ -143,7 +143,7 @@ if __name__ == "__main__":
         ## grid_dim * block_dim = total thread count
         if impl == 'cuda':
             block_dim = args.t_count
-            grid_dim = len(db_seqs)//64 if len(db_seqs) % 64 == 0 else len(db_seqs)//64 + 1
+            grid_dim = len(db_seqs)//block_dim if len(db_seqs) % block_dim == 0 else len(db_seqs)//block_dim + 1
         
         ####### Alignment #######
         ## Timing is including the time to set up all of the inputs/np.arrays to be fed to the kernel or used by Numba
@@ -191,5 +191,3 @@ if __name__ == "__main__":
         scores_list = list(scores)
         for score, desc in zip(scores_list, db_headers):
             f.write(f'> {score} | {desc}\n')
-
-    

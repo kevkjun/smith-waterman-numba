@@ -4,7 +4,7 @@ Query Sequence:
 Database: ../data/excerpt_pdbaa.fasta
 
 Implementation: jit
-Runtime: 3.8278267969999997
+Runtime: 3.22582886
 
 > 2 | 4HZI_B Chain B, Abc Transporter Atp-binding Protein [Leptospira interrogans serovar Copenhageni str. Fiocruz L1-130]
 > 7 | 5A5T_M Chain M, EUKARYOTIC TRANSLATION INITIATION FACTOR 3 SUBUNIT M [Oryctolagus cuniculus]

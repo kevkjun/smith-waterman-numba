@@ -77,7 +77,6 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
                 # b/c the scratch array is only 2d, it will be constantly written over as new maxes are found
                 # need to remember the new northwest which is the value in the current cell
                 new_northwest = scratch[thread_id, j]
-                print(new_northwest)
 
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
                 # have to manually calculate these indices bc otherwise numba freaks out about typing
@@ -163,8 +162,8 @@ if __name__ == "__main__":
         # create scratch np.array with enough spaces to compute scores for each residue of the alignment sequence
         scratch = np.zeros((len(db_seqs), len(np_alignment_seq)), dtype=np.int64)
 
-
         if impl == 'jit':
+            scores = np.zeros(len(db_seqs), dtype=np.int64)
             scores = align(gap, matrix, np_alignment_seq, np_db_seqs, scores, scratch)
         else:
             # copy the needed arrays to the device
@@ -179,7 +178,7 @@ if __name__ == "__main__":
             # launch kernel
             align_gpu[grid_dim, block_dim](gap, device_matrix, device_np_alignment_seq, device_db_seqs, device_scores, device_scratch)
 
-            scores = device_scratch.copy_to_host()
+            scores = device_scores.copy_to_host()
 
         stop = timer()
         runtime = stop - start

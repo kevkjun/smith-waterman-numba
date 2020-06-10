@@ -176,7 +176,7 @@ class GlobalAligner:
     """
     def __init__(self, i_seq, j_seq, scoring_mat, gap):
         super().__init__()
-        self.j_seq, self.i_seq, self.gap = self.init_seq(j_seq), self.init_seq(i_seq), -gap
+        self.j_seq, self.i_seq, self.gap = self.init_seq(j_seq), self.init_seq(i_seq), gap
 
         self.scoring_mat = pam250 if scoring_mat == 'PAM250' else blosum62
 
@@ -290,7 +290,7 @@ class LocalAligner:
     """
     def __init__(self, i_seq, j_seq, scoring_mat, gap):
         super().__init__()
-        self.j_seq, self.i_seq, self.gap = self.init_seq(j_seq), self.init_seq(i_seq), -gap
+        self.j_seq, self.i_seq, self.gap = self.init_seq(j_seq), self.init_seq(i_seq), gap
 
         self.scoring_mat = pam250 if scoring_mat == 'PAM250' else blosum62
 
@@ -407,7 +407,10 @@ if __name__ == "__main__":
         # https://stackoverflow.com/questions/5622976/how-do-you-calculate-program-run-time-in-python
         start = timeit.default_timer()
 
-        scores = [f'> {GlobalAligner(seq, str(record.seq), args.matrix, args.gap).alignment_score} | {record.description}\n' for record in SeqIO.parse(db, "fasta")]
+        if scope == 'global':
+            scores = [f'> {GlobalAligner(seq, str(record.seq), args.matrix, -gap).alignment_score} | {record.description}\n' for record in SeqIO.parse(db, "fasta")]
+        else:
+            scores = [f'> {LocalAligner(seq, str(record.seq), args.matrix, -gap).alignment_score} | {record.description}\n' for record in SeqIO.parse(db, "fasta")]
 
         stop = timeit.default_timer()
         runtime = stop - start

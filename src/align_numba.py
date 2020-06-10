@@ -74,7 +74,7 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
                     break
                 new_northwest = scratch[thread_id][j]
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
-                s = matrix[seq_res][db_seq_res]
+                s = matrix[seq_res-65][db_seq_res-65]
                 left = scratch[thread_id][j-1] if j > 0 else 0
                 
                 scratch[thread_id][j] = max(northwest + s, 
@@ -139,7 +139,7 @@ if __name__ == "__main__":
         start = timer() 
 
         # unpack the strings in db_seqs
-        db_seqs_chars = [[ord(db_seq[i]) if i < len(db_seq) else 0 for i in range(longest_length)] for db_seq in db_seqs]
+        db_seqs_chars = [[int(ord(db_seq[i])) if i < len(db_seq) else 0 for i in range(longest_length)] for db_seq in db_seqs]
 
         # create an np.array of np.array of ASCII codes for chars in sequences
         np_db_seqs = np.array(db_seqs_chars)

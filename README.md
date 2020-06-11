@@ -44,7 +44,7 @@ python align_numba.py --infile ../data/spike.fasta  --gap 5 --db ../data/excerpt
 
 For better performance, keep the `t_count` (thread count) to a multiple of 32.
 
-### Resources
+## Resources
 
 * https://github.com/harrism/numba_examples/blob/master/mandelbrot_numba.ipynb
 * https://numba.pydata.org/numba-doc/latest/user/5minguide.html

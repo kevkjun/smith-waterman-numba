@@ -46,10 +46,10 @@ For better performance, keep the `t_count` (thread count) to a multiple of 32.
 
 ### Resources
 
-https://github.com/harrism/numba_examples/blob/master/mandelbrot_numba.ipynb
-https://numba.pydata.org/numba-doc/latest/user/5minguide.html
-https://numba.pydata.org/numba-doc/dev/cuda/cudapysupported.html
-https://numba.pydata.org/numba-doc/dev/cuda/kernels.html#kernel-declaration
-https://nyu-cds.github.io/python-numba/05-cuda/
-https://devblogs.nvidia.com/numba-python-cuda-acceleration/
-https://numba.pydata.org/numba-doc/dev/developer/literal.html
+* https://github.com/harrism/numba_examples/blob/master/mandelbrot_numba.ipynb
+* https://numba.pydata.org/numba-doc/latest/user/5minguide.html
+* https://numba.pydata.org/numba-doc/dev/cuda/cudapysupported.html
+* https://numba.pydata.org/numba-doc/dev/cuda/kernels.html#kernel-declaration
+* https://nyu-cds.github.io/python-numba/05-cuda/
+* https://devblogs.nvidia.com/numba-python-cuda-acceleration/
+* https://numba.pydata.org/numba-doc/dev/developer/literal.html

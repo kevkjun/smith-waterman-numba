@@ -41,14 +41,14 @@ The results matched closely to what I expected. The CPU Numba ran much faster th
 
 CPU Numba represented a `272x` speedup over the serial implementation, and the fastest CUDA run `<grid_dim=8, block_dim=64>` was a `8,457x` speedup over CPU Numba and a `2,304,163x` speedup over Serial. Without a count of the registers used, I couldn't calculate the CUDA occupancy so optimizing the `grid_dim` and `block_dim` was kind of a shot in the dark.
 
-| Implementation | Runtime |
-| :-------------:| -------:|
-| Serial         | 853.69264 |
-| CPU Numba      | 3.1334123 |
-| CUDA<16,32>    | 0.0004447 |
-| CUDA<8,64>     | 0.0003705 |
-| CUDA<4,128>    | 0.0003776 |
-| CUDA<2,256>    | 0.0003848 |
+| Implementation | Runtime (seconds) |
+| :-------------| -------:|
+| Serial         | 853.69264108 |
+| CPU Numba      | 3.13341230 |
+| CUDA <16,32>    | 0.0004447 |
+| CUDA <8,64>     | 0.0003705 |
+| CUDA <4,128>    | 0.0003776 |
+| CUDA <2,256>    | 0.0003848 |
 
 ## Discussion
 
@@ -61,7 +61,7 @@ I would have liked to test this implementation against the entire pdbaa database
 * “CUDA Programming.” Introduction to Numba: CUDA Programming, nyu-cds.github.io/python-numba/05-cuda/.
 * Harris, Mark, et al. “Numba: High-Performance Python with CUDA Acceleration.” NVIDIA Developer Blog, 29 Apr. 2020, devblogs.nvidia.com/numba-python-cuda-acceleration/.
 * Harrism. “Harrism/numba_examples.” GitHub, github.com/harrism/numba_examples/blob/master/mandelbrot_numba.ipynb.
-* “Notes on Literal Types¶.” Notes on Literal Types - Numba 0.50.0.dev0+236.g64fbf2b-py3.7-Linux-x86_64.Egg Documentation, numba.pydata.org/numba-doc/dev/developer/literal.html.
-* “Supported Python Features in CUDA Python¶.” Supported Python Features in CUDA Python - Numba 0.50.0.dev0+236.g64fbf2b-py3.7-Linux-x86_64.Egg Documentation, numba.pydata.org/numba-doc/dev/cuda/cudapysupported.html.
-* “Writing CUDA Kernels¶.” Writing CUDA Kernels - Numba 0.50.0.dev0+236.g64fbf2b-py3.7-Linux-x86_64.Egg Documentation, numba.pydata.org/numba-doc/dev/cuda/kernels.html.
-* “A ~5 Minute Guide to Numba¶.” A ~5 Minute Guide to Numba - Numba 0.49.1-py3.6-Macosx-10.7-x86_64.Egg Documentation, numba.pydata.org/numba-doc/latest/user/5minguide.html.
+* “Notes on Literal Types.” Notes on Literal Types - Numba 0.50.0.dev0+236.g64fbf2b-py3.7-Linux-x86_64.Egg Documentation, numba.pydata.org/numba-doc/dev/developer/literal.html.
+* “Supported Python Features in CUDA Python.” Supported Python Features in CUDA Python - Numba 0.50.0.dev0+236.g64fbf2b-py3.7-Linux-x86_64.Egg Documentation, numba.pydata.org/numba-doc/dev/cuda/cudapysupported.html.
+* “Writing CUDA Kernels.” Writing CUDA Kernels - Numba 0.50.0.dev0+236.g64fbf2b-py3.7-Linux-x86_64.Egg Documentation, numba.pydata.org/numba-doc/dev/cuda/kernels.html.
+* “A ~5 Minute Guide to Numba.” A ~5 Minute Guide to Numba - Numba 0.49.1-py3.6-Macosx-10.7-x86_64.Egg Documentation, numba.pydata.org/numba-doc/latest/user/5minguide.html.

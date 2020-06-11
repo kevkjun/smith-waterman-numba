@@ -39,7 +39,7 @@ The project worked and performed as I expected. The timing methodology was inter
 
 The results matched closely to what I expected. The CPU Numba ran much faster than Serial, and CUDA ran much faster than the CPU Numba. The CUDA runtimes in the chart below correspond to kernel launches of `<grid_dim, block_dim>`.
 
-CPU Numba represented a `272x` speedup over the serial implementation, and the fastest CUDA run `<grid_dim=8, block_dim=64>` was a `8,457x` speedup over CPU Numba and a `2,304,163x` speedup over Serial. Without a count of the registers used, I couldn't calculate the GPU occupancy so optimizing the `grid_dim` and `block_dim` was kind of a shot in the dark.
+CPU Numba represented a `272x` speedup over the serial implementation, and the fastest CUDA run `<grid_dim=8, block_dim=64>` was a `8,457x` speedup over CPU Numba and a `2,304,163x` speedup over Serial. Without a count of the registers used, I couldn't calculate the GPU occupancy so optimizing the `grid_dim` and `block_dim` was kind of a shot in the dark. In fact, I saw that the "best" `grid_dim` and `block_dim` combination swapped frequently.
 
 | Implementation | Runtime (seconds) |
 | :-------------| -------:|

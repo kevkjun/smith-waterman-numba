@@ -1,0 +1,4 @@
+block_dim = 32
+block_dim = 64
+block_dim = 128
+block_dim = 256

@@ -46,8 +46,12 @@ def align(gap, matrix, seq, db, res, scratch):
         for j, seq_res in enumerate(seq):
             northwest = 0
             for k, db_seq_res in enumerate(db_seq):
+
+                # break statement is checking to see if we've reached the end of the database sequence
+                # this is necessary bc in order to switch a list of lists into a numpy array, each row needs to be the same length
                 if db_seq_res == 0:
                     break
+
                 new_northwest = scratch[i][j]
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
                 scratch[i][j] = score(i, j, gap, northwest, up, matrix, seq_res - 65, db_seq_res - 65, scratch)
@@ -78,34 +82,36 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
     for j in range(len(seq)):
         northwest = 0
         for k in range(len(db[thread_id])):
-                if db[thread_id, k] == 0:
-                    break
+            # break statement is checking to see if we've reached the end of the database sequence
+            # this is necessary bc in order to switch a list of lists into a numpy array, each row needs to be the same length
+            if db[thread_id, k] == 0:
+                break
 
-                # b/c the scratch array is only 2d, it will be constantly written over as new maxes are found
-                # need to remember the new northwest which is the value in the current cell
-                new_northwest = scratch[thread_id, j]
+            # b/c the scratch array is only 2d, it will be constantly written over as new maxes are found
+            # need to remember the new northwest which is the value in the current cell
+            new_northwest = scratch[thread_id, j]
 
-                # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
-                # have to manually calculate these indices bc otherwise numba freaks out about typing
-                i_idx = seq[j]-65
-                j_idx = db[thread_id, k]-65
+            # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
+            # have to manually calculate these indices bc otherwise numba freaks out about typing
+            i_idx = seq[j]-65
+            j_idx = db[thread_id, k]-65
 
-                # find scores from the matrix and compare with left, up, nw, and 0 to get max
-                s = matrix[i_idx, j_idx]
-                left = scratch[thread_id, j-1] if j > 0 else 0
-                
-                scratch[thread_id, j] = max(northwest + s, 
-                                            left + gap, 
-                                            up + gap, 
-                                            0)
-                if scratch[thread_id, j] > largest:
-                    largest = scratch[thread_id, j]
-                # scratch[thread_id][j] = score_gpu(thread_id, j, gap, northwest, up, matrix, seq_res - 65, db_seq_res - 65, scratch)
-                northwest = new_northwest
+            # find scores from the matrix and compare with left, up, nw, and 0 to get max
+            s = matrix[i_idx, j_idx]
+            left = scratch[thread_id, j-1] if j > 0 else 0
+            
+            scratch[thread_id, j] = max(northwest + s, 
+                                        left + gap, 
+                                        up + gap, 
+                                        0)
+            if scratch[thread_id, j] > largest:
+                largest = scratch[thread_id, j]
+            # scratch[thread_id][j] = score_gpu(thread_id, j, gap, northwest, up, matrix, seq_res - 65, db_seq_res - 65, scratch)
+            northwest = new_northwest
 
-                # set the new "northward" cell for the next calculation. 
-                # it's the next cell in the scratch array. must mod in case it runs over
-                up = scratch[thread_id, j+1 % len(seq)]
+            # set the new "northward" cell for the next calculation. 
+            # it's the next cell in the scratch array. must mod in case it runs over
+            up = scratch[thread_id, j+1 % len(seq)]
         res[thread_id] = largest
 
 

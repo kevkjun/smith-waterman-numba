@@ -41,6 +41,7 @@ def align(gap, matrix, seq, db, res, scratch):
     ref_seq_len = len(seq)
     # sequences are provided as list of ints (ASCII codes for residue char)
     for i, db_seq in enumerate(db):
+        largest = 0
         up = 0
         for j, seq_res in enumerate(seq):
             northwest = 0
@@ -51,8 +52,13 @@ def align(gap, matrix, seq, db, res, scratch):
                 # subtract by 65 bc 65 is ASCII code for 'A' - subtraction creates indices into scoring matrix
                 scratch[i][j] = score(i, j, gap, northwest, up, matrix, seq_res - 65, db_seq_res - 65, scratch)
                 northwest = new_northwest
+
+                # smith waterman is local alignment so looking for the local largest score
+                if scratch[i][j] > largest:
+                    largest = scratch[i][j]
                 up = scratch[i][j+1 % len(seq)]
-        res[i] = scratch[i][ref_seq_len - 1]
+        # alignment score is the largest from aligning the entire sequence
+        res[i] = largest
     return res
 
 
@@ -68,6 +74,7 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
     ref_seq_len = len(seq)
     up = 0
     thread_id = cuda.grid(1)
+    largest = 0
     for j in range(len(seq)):
         northwest = 0
         for k in range(len(db[thread_id])):
@@ -91,13 +98,15 @@ def align_gpu(gap, matrix, seq, db, res, scratch):
                                             left + gap, 
                                             up + gap, 
                                             0)
+                if scratch[thread_id, j] > largest:
+                    largest = scratch[thread_id, j]
                 # scratch[thread_id][j] = score_gpu(thread_id, j, gap, northwest, up, matrix, seq_res - 65, db_seq_res - 65, scratch)
                 northwest = new_northwest
 
                 # set the new "northward" cell for the next calculation. 
                 # it's the next cell in the scratch array. must mod in case it runs over
                 up = scratch[thread_id, j+1 % len(seq)]
-        res[thread_id] = scratch[thread_id, ref_seq_len - 1]
+        res[thread_id] = largest
 
 
 if __name__ == "__main__":

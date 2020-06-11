@@ -9,5 +9,5 @@
 module load Anaconda3
 source activate mpcs56420
 
-printf "JIT Run 1\n"
+printf "JIT Demo\n"
 python ../src/align_numba.py --infile ../data/spike.fasta --gap 3 --db ../data/excerpt_pdbaa.fasta --matrix BLOSUM62 --out ../results/jit_demo.txt --impl jit

@@ -1,4 +1,4 @@
-# Smith-Waterman Algo CUDA Implementation
+# Speeding up Smith-Waterman using Numba
 
 Kevin Jun - MPCS 56420
 

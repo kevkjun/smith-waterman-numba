@@ -1,5 +1,8 @@
 # README - MPCS 56420 Final Project
 
+Kevin Jun - MPCS 56420  
+Write up can be found in `writeup.md`.
+
 ## Requirements
 
 ### Packages

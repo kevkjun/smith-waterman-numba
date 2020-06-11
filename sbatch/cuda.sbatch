@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=align_cuda
-#SBATCH --output=align_cuda.log
+#SBATCH --output=align_cuda.out
 #SBATCH --time=00:10:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
